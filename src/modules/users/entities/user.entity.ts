@@ -9,7 +9,7 @@ import {
     JoinColumn,
     OneToMany
 } from 'typeorm';
-import { Exclude } from 'class-transoformer'
+import { Exclude } from 'class-transformer'
 
 @Entity('users')
 export class Users {
