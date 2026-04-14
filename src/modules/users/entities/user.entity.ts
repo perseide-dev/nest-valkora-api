@@ -10,6 +10,7 @@ import {
     OneToMany
 } from 'typeorm';
 import { Exclude } from 'class-transformer'
+import { Roles } from 'src/modules/roles/entities/roles.entity';
 
 @Entity('users')
 export class Users {
@@ -74,7 +75,7 @@ export class Users {
 
     // FKs
 
-    @ManyToOne(() => Roles, roles => roles.users, { nullable: false })
+    @ManyToOne(() => Roles, role => role.users, { nullable: false })
     @JoinColumn({ name: 'rol_id' })
     rol: Roles;
 
