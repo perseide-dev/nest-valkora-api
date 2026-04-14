@@ -1,3 +1,5 @@
+import { UserModule } from './modules/users/user.module';
+import { AuthModule } from './modules/auth/auth.module';
 // src/app.module.ts
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -5,7 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import appConfig from './config/app.config';
 
 @Module({
-  imports: [
+  imports: [UserModule, AuthModule,
     // 1. Configuración Global
     ConfigModule.forRoot({
       isGlobal: true,

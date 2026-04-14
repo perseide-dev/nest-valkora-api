@@ -13,16 +13,16 @@ export class AuthService {
   async login(loginDto: LoginUserDto) {
     const user = await this.usersService.findOneByEmail(loginDto.email);
 
-    // 1. Validar contraseña
+    // 1. Validate password
     const isMatch = await bcrypt.compare(loginDto.password, user.password);
     if (!isMatch) throw new UnauthorizedException('Credenciales inválidas');
 
-    // 2. Generar Tokens
+    // 2. Generate Tokens
     const payload = { sub: user.id, email: user.email };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
-    // 3. Hashear y guardar el Refresh Token en DB para persistencia de sesión
+    // 3. Hash and store the refresh token in the database to maintain the session
     const salt = await bcrypt.genSalt();
     const hashedRT = await bcrypt.hash(refreshToken, salt);
     await this.usersService.updateRefreshToken(user.id, hashedRT);
@@ -35,11 +35,11 @@ export class AuthService {
       const payload = await this.jwtService.verifyAsync(refreshToken);
       const user = await this.usersService.findOneById(payload.sub);
 
-      // Comparar el refresh token con el hash guardado en DB
+      // 1. Compare the refresh token with the hash stored in the database
       const isMatch = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
       if (!isMatch) throw new UnauthorizedException();
 
-      // Generar nuevo Access Token
+      // 2. Generate new Access Token
       const accessToken = this.jwtService.sign({ sub: user.id, email: user.email }, { expiresIn: '15m' });
 
       return { accessToken };
