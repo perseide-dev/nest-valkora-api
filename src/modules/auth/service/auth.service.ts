@@ -29,4 +29,24 @@ export class AuthService {
 
     return { user, accessToken, refreshToken };
   }
+
+  async refreshSession(refreshToken: string) {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken);
+      const user = await this.usersService.findOneById(payload.sub);
+
+      // Comparar el refresh token con el hash guardado en DB
+      const isMatch = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
+      if (!isMatch) throw new UnauthorizedException();
+
+      // Generar nuevo Access Token
+      const accessToken = this.jwtService.sign({ sub: user.id, email: user.email }, { expiresIn: '15m' });
+
+      return { accessToken };
+    } catch {
+      throw new UnauthorizedException();
+    }
+  }
+
+
 }
