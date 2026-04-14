@@ -61,6 +61,8 @@ export class Users {
     @Column({ default: false })
     isOnline: boolean;
 
+    // Audit FKs
+
     @ManyToOne(() => Users)
     @JoinColumn({ name: 'created_by_id' })
     createdBy: Users;
