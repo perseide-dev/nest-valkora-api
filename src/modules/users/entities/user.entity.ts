@@ -13,6 +13,9 @@ import { Exclude } from 'class-transoformer'
 
 @Entity('users')
 export class Users {
+
+    // id
+
     @PrimaryGeneratedColumn({ type: 'bigint' })
     id: number
 
@@ -20,24 +23,22 @@ export class Users {
     @Index() // fast search
     uuid: string
 
+
+    // user
+
     @Column({ unique: true })
     userName: string;
 
     @Column({ unique: true })
     accountName: string;
 
+    @Column({ unique: true })
+    email: string;
+
     @Column()
     @Exclude()
     password: string;
 
-    // FKs
-
-    @ManyToOne(() => Roles, roles => roles.users, { nullable: false })
-    @JoinColumn({ name: 'rol_id' })
-    rol: Roles;
-
-    @OneToMany(() => profiles, (profile) => profile.user)
-    profiles: Profiles[]
 
     // Security and Tokens
 
@@ -57,6 +58,9 @@ export class Users {
     @Column({ default: false })
     isAprove: boolean;
 
+    @Column({ default: false })
+    isOnline: boolean;
+
     @ManyToOne(() => Users)
     @JoinColumn({ name: 'created_by_id' })
     createdBy: Users;
@@ -66,11 +70,13 @@ export class Users {
     @JoinColumn({ name: 'updated_by_id' })
     updatedBy: Users;
 
-    @ManyToOne(() => Users)
-    @JoinColumn({ name: 'updated_by_id' })
-    aproveBy: Users;
+    // FKs
 
+    @ManyToOne(() => Roles, roles => roles.users, { nullable: false })
+    @JoinColumn({ name: 'rol_id' })
+    rol: Roles;
 
-
+    @OneToMany(() => profiles, (profile) => profile.user)
+    profiles: Profiles[]
 
 }
