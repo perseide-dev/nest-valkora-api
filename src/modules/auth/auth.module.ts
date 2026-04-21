@@ -5,9 +5,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './service/auth.service';
 import { AuthController } from './controller/auth.controller';
 import { UserModule } from '../users/user.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Roles } from '../roles/entities/roles.entity';
+import { Permissions } from '../permissions/entities/permissions.entity';
+import { Users } from '../users/entities/user.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Roles, Permissions, Users]),
     UserModule,
     PassportModule,
     JwtModule.registerAsync({

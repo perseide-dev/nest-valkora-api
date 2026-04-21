@@ -1,6 +1,6 @@
-import { Controller, Post, Body, Res, UnauthorizedException, HttpStatus } from '@nestjs/common';
-import { Response } from 'express';
-import { AuthService } from '../services/auth.service';
+import { Controller, Post, Body, Res, UnauthorizedException, HttpStatus, Headers } from '@nestjs/common';
+import type { Response } from 'express';
+import { AuthService } from '../service/auth.service';
 import { LoginUserDto } from '../dto/login-user.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 
@@ -36,10 +36,16 @@ export class AuthController {
     return {
       message: 'Login exitoso',
       user: {
-        username: user.username,
+        username: user.userName,
         email: user.email,
         rol: user.rol,
       },
     };
+  }
+
+  @Public()
+  @Post('setup')
+  async setup(@Headers('x-api-key') apiKey: string) {
+    return this.authService.setupInitialData(apiKey);
   }
 }

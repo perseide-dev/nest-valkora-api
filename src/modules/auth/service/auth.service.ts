@@ -2,12 +2,28 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../../users/services/user.service';
+import { LoginUserDto } from '../dto/login-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Roles } from 'src/modules/roles/entities/roles.entity';
+import { Permissions } from 'src/modules/permissions/entities/permissions.entity';
+import { Users } from 'src/modules/users/entities/user.entity';
+import { Modules } from 'src/common/enums/module.enum';
+import { Focus } from 'src/common/enums/focus.enum';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService,
+    @InjectRepository(Roles)
+    private readonly roleRepository: Repository<Roles>,
+    @InjectRepository(Permissions)
+    private readonly permissionRepository: Repository<Permissions>,
+    @InjectRepository(Users)
+    private readonly userRepository: Repository<Users>,
   ) { }
 
   async login(loginDto: LoginUserDto) {
@@ -36,6 +52,7 @@ export class AuthService {
       const user = await this.usersService.findOneById(payload.sub);
 
       // 1. Compare the refresh token with the hash stored in the database
+      if (!user.hashedRefreshToken) throw new UnauthorizedException('Sesión no encontrada');
       const isMatch = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
       if (!isMatch) throw new UnauthorizedException();
 
@@ -49,4 +66,57 @@ export class AuthService {
   }
 
 
+  async setupInitialData(apiKey: string) {
+    const systemApiKey = this.configService.get('config.API_KEY_SYSTEM');
+    if (apiKey !== systemApiKey) throw new UnauthorizedException('API Key inválida');
+
+    // 1. Crear Rol SUPER_ADMIN si no existe
+    let adminRole = await this.roleRepository.findOne({ where: { rolName: 'SUPER_ADMIN' } });
+    if (!adminRole) {
+      adminRole = this.roleRepository.create({ rolName: 'SUPER_ADMIN' });
+      adminRole = await this.roleRepository.save(adminRole);
+    }
+
+    // 2. Crear Permisos para todos los módulos
+    const modules = Object.values(Modules);
+    for (const moduleName of modules) {
+      let perm = await this.permissionRepository.findOne({
+        where: { rol: { id: adminRole.id }, module: moduleName }
+      });
+
+      if (!perm) {
+        perm = this.permissionRepository.create({
+          permissionName: `ALL_ACCESS_${moduleName}`,
+          module: moduleName,
+          focus: Focus.ALL,
+          create: true,
+          read: true,
+          update: true,
+          delete: true,
+          rol: adminRole
+        });
+        await this.permissionRepository.save(perm);
+      }
+    }
+
+    // 3. Crear Primer Usuario si no hay ninguno
+    const userCount = await this.userRepository.count();
+    if (userCount === 0) {
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await bcrypt.hash('admin123', salt);
+      const adminUser = this.userRepository.create({
+        userName: 'superadmin',
+        accountName: 'Super Admin',
+        email: 'admin@valkora.com',
+        password: hashedPassword,
+        rol: adminRole,
+        isActive: true,
+        isAprove: true
+      });
+      await this.userRepository.save(adminUser);
+      return { message: 'Setup completado. Usuario: admin@valkora.com / admin123' };
+    }
+
+    return { message: 'El sistema ya ha sido inicializado anteriormente' };
+  }
 }

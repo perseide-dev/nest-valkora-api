@@ -2,7 +2,7 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
-import { AuthService } from 'src/modules/auth/services/auth.service';
+import { AuthService } from 'src/modules/auth/service/auth.service';
 
 @Injectable()
 export class SessionGuard implements CanActivate {
@@ -36,7 +36,7 @@ export class SessionGuard implements CanActivate {
       // 3. Si falló por expiración, intentamos el Silent Refresh
       if (refreshToken) {
         try {
-          const { newAccessToken } = await this.authService.refreshSession(refreshToken);
+          const { accessToken: newAccessToken } = await this.authService.refreshSession(refreshToken);
 
           // Seteamos la nueva cookie de forma transparente
           response.cookie('Authentication', newAccessToken, {

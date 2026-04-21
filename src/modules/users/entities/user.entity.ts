@@ -7,7 +7,9 @@ import {
     Index,
     ManyToOne,
     JoinColumn,
-    OneToMany
+    OneToMany,
+    ManyToMany,
+    JoinTable
 } from 'typeorm';
 import { Exclude } from 'class-transformer'
 import { Roles } from 'src/modules/roles/entities/roles.entity';
@@ -84,7 +86,7 @@ export class Users {
     @JoinTable({ name: 'users_control_groups' })
     controlGroups: ControlGroup[];
 
-    @OneToMany(() => profiles, (profile) => profile.user)
-    profiles: Profiles[]
+    // @OneToMany(() => profiles, (profile) => profile.user)
+    // profiles: Profiles[]
 
 }

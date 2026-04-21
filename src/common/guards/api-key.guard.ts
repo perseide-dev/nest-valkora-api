@@ -18,5 +18,7 @@ export class ApiKeyGuard implements CanActivate {
     return true;
   }
 
-  private async validateApiKey(key: string) { }
+  private async validateApiKey(key: string): Promise<boolean> {
+    return true; // Implement logic if needed
+  }
 }
