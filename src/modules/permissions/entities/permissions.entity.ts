@@ -3,9 +3,14 @@ import {
     PrimaryGeneratedColumn,
     Column,
     ManyToOne,
-    JoinColumn
+    JoinColumn,
+    CreateDateColumn,
+    UpdateDateColumn
 } from 'typeorm';
 import { Roles } from 'src/modules/roles/entities/roles.entity';
+import { Users } from 'src/modules/users/entities/user.entity';
+import { Modules } from 'src/common/enums/module.enum';
+import { Focus } from 'src/common/enums/focus.enum';
 
 @Entity('permissions')
 export class Permissions {
@@ -15,10 +20,40 @@ export class Permissions {
     @Column({ unique: true, nullable: false })
     permissionName: string;
 
-    @Column({ unique: true, nullable: false })
-    module: string;
+
+    @Column({ type: 'enum', enum: Modules, unique: true, nullable: false })
+    module: Modules;
+
+    @Column({ type: 'enum', enum: Focus, default: Focus.SELF })
+    focus: Focus;
+
+    @Column({ default: true })
+    create: boolean;
+
+    @Column({ default: true })
+    read: boolean;
+
+    @Column({ default: true })
+    update: boolean;
+
+    @Column({ default: true })
+    delete: boolean;
 
     @ManyToOne(() => Roles, role => role.permissions, { nullable: false })
     @JoinColumn({ name: 'rol_id' })
     rol: Roles;
+
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at' })
+    updatedAt: Date;
+
+    @ManyToOne(() => Users)
+    @JoinColumn({ name: 'created_by_id' })
+    createdBy: Users;
+
+    @ManyToOne(() => Users)
+    @JoinColumn({ name: 'updated_by_id' })
+    updatedBy: Users;
 }

@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer'
 import { Roles } from 'src/modules/roles/entities/roles.entity';
+import { ControlGroup } from 'src/modules/control-groups/entities/control-group.entity';
 
 @Entity('users')
 export class Users {
@@ -78,6 +79,10 @@ export class Users {
     @ManyToOne(() => Roles, role => role.users, { nullable: false })
     @JoinColumn({ name: 'rol_id' })
     rol: Roles;
+
+    @ManyToMany(() => ControlGroup, (cg) => cg.users)
+    @JoinTable({ name: 'users_control_groups' })
+    controlGroups: ControlGroup[];
 
     @OneToMany(() => profiles, (profile) => profile.user)
     profiles: Profiles[]
