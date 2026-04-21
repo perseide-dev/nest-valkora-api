@@ -23,7 +23,7 @@ export class Users {
     @PrimaryGeneratedColumn({ type: 'bigint' })
     id: number
 
-    @Column({ type: 'uuid', unique: true, default: () => 'uuid_generate_v4()' })
+    @Column({ type: 'uuid', unique: true, default: () => 'gen_random_uuid()' })
     @Index() // fast search
     uuid: string
 
