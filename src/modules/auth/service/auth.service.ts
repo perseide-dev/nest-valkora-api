@@ -27,7 +27,7 @@ export class AuthService {
   ) { }
 
   async login(loginDto: LoginUserDto) {
-    const user = await this.usersService.findOneByEmail(loginDto.email);
+    const user = await this.usersService.findOneByIdentity(loginDto.email);
 
     // 1. Validate password
     const isMatch = await bcrypt.compare(loginDto.password, user.password);
@@ -66,10 +66,11 @@ export class AuthService {
   }
 
 
-  async setupInitialData(apiKey: string) {
-    const systemApiKey = this.configService.get('config.API_KEY_SYSTEM');
-    if (apiKey !== systemApiKey) throw new UnauthorizedException('API Key inválida');
-
+  /**
+   * Inicializa el sistema creando el rol SUPER_ADMIN, permisos y el primer usuario.
+   * Método diseñado para ser llamado desde el controlador (con API Key) o desde el CLI.
+   */
+  async initializeSystem(customData?: { email?: string; userName?: string; password?: string }) {
     // 1. Crear Rol SUPER_ADMIN si no existe
     let adminRole = await this.roleRepository.findOne({ where: { rolName: 'SUPER_ADMIN' } });
     if (!adminRole) {
@@ -102,21 +103,37 @@ export class AuthService {
     // 3. Crear Primer Usuario si no hay ninguno
     const userCount = await this.userRepository.count();
     if (userCount === 0) {
+      const email = customData?.email || 'admin@valkora.com';
+      const userName = customData?.userName || 'superadmin';
+      const password = customData?.password || 'admin123';
+
       const salt = await bcrypt.genSalt();
-      const hashedPassword = await bcrypt.hash('admin123', salt);
+      const hashedPassword = await bcrypt.hash(password, salt);
       const adminUser = this.userRepository.create({
-        userName: 'superadmin',
+        userName,
         accountName: 'Super Admin',
-        email: 'admin@valkora.com',
+        email,
         password: hashedPassword,
         rol: adminRole,
         isActive: true,
         isAprove: true
       });
       await this.userRepository.save(adminUser);
-      return { message: 'Setup completado. Usuario: admin@valkora.com / admin123' };
+      return { 
+        message: 'Setup completado exitosamente.', 
+        credentials: { email, userName, password } 
+      };
     }
 
     return { message: 'El sistema ya ha sido inicializado anteriormente' };
+  }
+
+  /**
+   * Wrapper para el controlador que valida la API Key antes de inicializar.
+   */
+  async setupInitialData(apiKey: string) {
+    const systemApiKey = this.configService.get('config.API_KEY_SYSTEM');
+    if (apiKey !== systemApiKey) throw new UnauthorizedException('API Key inválida');
+    return this.initializeSystem();
   }
 }

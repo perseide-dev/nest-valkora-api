@@ -1,8 +1,11 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
+  constructor(private configService: ConfigService) { }
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
     const apiKey = request.header('x-api-key');
@@ -11,14 +14,12 @@ export class ApiKeyGuard implements CanActivate {
       throw new UnauthorizedException('API Key is missing');
     }
 
+    const systemApiKey = this.configService.get('config.API_KEY_SYSTEM');
 
-    const isValid = await this.validateApiKey(apiKey);
-    if (!isValid) throw new UnauthorizedException('Invalid API Key');
+    if (apiKey !== systemApiKey) {
+      throw new UnauthorizedException('Invalid API Key');
+    }
 
     return true;
-  }
-
-  private async validateApiKey(key: string): Promise<boolean> {
-    return true; // Implement logic if needed
   }
 }

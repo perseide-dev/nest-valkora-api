@@ -60,6 +60,18 @@ export class UsersService {
     return user;
   }
 
+  async findOneByIdentity(identity: string): Promise<Users> {
+    const user = await this.userRepository.findOne({
+      where: [
+        { email: identity },
+        { userName: identity }
+      ],
+      relations: ['rol', 'controlGroups']
+    });
+    if (!user) throw new NotFoundException('Usuario no encontrado por email o username');
+    return user;
+  }
+
   async findOneById(id: string | number): Promise<Users> {
     const user = await this.userRepository.findOne({
       where: { id: Number(id) },

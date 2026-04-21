@@ -2,8 +2,10 @@ import { RolesModule } from './modules/roles/roles.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { UserModule } from './modules/users/user.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ApiKeyGuard } from './common/guards/api-key.guard';
 // src/app.module.ts
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import appConfig from './config/app.config';
@@ -39,6 +41,12 @@ import appConfig from './config/app.config';
 
     // Tus otros módulos
     // AuthModule, UsersModule...
+  ],
+  providers: [
+    {
+      provide: 'APP_GUARD',
+      useClass: ApiKeyGuard,
+    },
   ],
 })
 export class AppModule { }
