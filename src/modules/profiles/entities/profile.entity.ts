@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, Index, OneToOne, JoinColumn } f
 import { Exclude } from "class-transformer";
 import { Lover } from "./lover.entity";
 import { Assets } from "./assets.enttity";
+import { ProfileInfo } from "./profileInfo.entity";
 
 @Entity('profiles')
 export class Profile {
@@ -21,5 +22,8 @@ export class Profile {
     @JoinColumn()
     lover: Lover;
 
+    @OneToOne(() => ProfileInfo, (profileInfo) => profileInfo.profile)
+    @JoinColumn()
+    profileInfo: ProfileInfo;
 
 }
