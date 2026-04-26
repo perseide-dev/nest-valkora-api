@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Query,
   Param,
   Patch,
   Post,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ProfileService } from '../service/profile.service';
 import { SessionGuard } from 'src/common/guards/session.guard';
 
@@ -24,8 +26,8 @@ export class ProfileController {
   }
 
   @Get()
-  findAll() {
-    return this.profileService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.profileService.findAll(paginationDto);
   }
 
   @Get(':id')

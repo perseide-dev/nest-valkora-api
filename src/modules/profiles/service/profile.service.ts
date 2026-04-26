@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
+import { PaginationDto, PaginatedResponse } from 'src/common/dto/pagination.dto';
 import { Profile } from '../entities/profile.entity';
 import { Assets } from '../entities/assets.enttity';
 import { Lover } from '../entities/lover.entity';
@@ -51,10 +52,27 @@ export class ProfileService {
     return await this.profileRepository.save(profile);
   }
 
-  async findAll() {
-    return await this.profileRepository.find({
+  async findAll(paginationDto: PaginationDto): Promise<PaginatedResponse<Profile>> {
+    const { page = 1, limit = 10 } = paginationDto;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.profileRepository.findAndCount({
+      skip,
+      take: limit,
       relations: ['assets', 'lover', 'profileInfo', 'user'],
     });
+
+    const lastPage = Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        lastPage,
+        limit,
+      },
+    };
   }
 
   async findOne(id: number) {
