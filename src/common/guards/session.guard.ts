@@ -2,6 +2,7 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from 'src/modules/auth/service/auth.service';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class SessionGuard implements CanActivate {
     private jwtService: JwtService,
     private authService: AuthService,
     private reflector: Reflector,
+    private configService: ConfigService,
   ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -38,10 +40,12 @@ export class SessionGuard implements CanActivate {
         try {
           const { accessToken: newAccessToken } = await this.authService.refreshSession(refreshToken);
 
+          const isProduction = this.configService.get('config.NODE_ENV') === 'production';
+
           // Seteamos la nueva cookie de forma transparente
           response.cookie('Authentication', newAccessToken, {
             httpOnly: true,
-            secure: true,
+            secure: isProduction,
             sameSite: 'strict',
             maxAge: 15 * 60 * 1000,
           });

@@ -3,12 +3,12 @@ import { PermissionsModule } from './modules/permissions/permissions.module';
 import { UserModule } from './modules/users/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ApiKeyGuard } from './common/guards/api-key.guard';
-// src/app.module.ts
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import appConfig from './config/app.config';
+import { DebugLoggerMiddleware } from './common/middleware/debug-logger.middleware';
 
 @Module({
   imports: [RolesModule, PermissionsModule, UserModule, AuthModule,

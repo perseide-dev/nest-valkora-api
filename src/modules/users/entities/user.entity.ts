@@ -46,10 +46,6 @@ export class Users {
 
     // Security and Tokens
 
-    @Column({ unique: true, nullable: true })
-    @Index()
-    apiKey: string;
-
     @Column({ nullable: true })
     @Exclude()
     hashedRefreshToken?: string;

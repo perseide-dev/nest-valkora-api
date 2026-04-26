@@ -19,7 +19,7 @@ async function bootstrap() {
   // 3. Habilitar Cookie Parser para JWT en cookies
   app.use(cookieParser());
 
-  // 4. CORS (Opcional, habilitar según sea necesario para el frontend)
+  // 4. CORS
   app.enableCors({
     origin: true,
     credentials: true,
