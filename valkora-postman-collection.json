@@ -310,6 +310,71 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Profiles",
+			"item": [
+				{
+					"name": "Get All Profiles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/profiles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profiles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userUuid\": \"REPLACE_WITH_USER_UUID\",\n    \"assets\": {\n        \"banner\": \"banner_url\",\n        \"profile1\": \"p1_url\",\n        \"profile2\": \"p2_url\",\n        \"albumn\": \"album_url\",\n        \"song\": \"song_url\",\n        \"favorite\": \"fav_url\"\n    },\n    \"lover\": {\n        \"profileImg\": \"img_url\",\n        \"coverImg\": \"cover_url\"\n    },\n    \"profileInfo\": {\n        \"name\": \"Profile Name\",\n        \"phrase\": \"Thinking is gravity\",\n        \"nationality\": \"Nationality\",\n        \"job\": \"Runner\",\n        \"race\": \"Human\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/profiles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profiles"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [

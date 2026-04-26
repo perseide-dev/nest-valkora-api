@@ -14,6 +14,7 @@ import {
 import { Exclude } from 'class-transformer'
 import { Roles } from 'src/modules/roles/entities/roles.entity';
 import { ControlGroup } from 'src/modules/control-groups/entities/control-group.entity';
+import { Profile } from 'src/modules/profiles/entities/profile.entity';
 
 @Entity('users')
 export class Users {
@@ -83,7 +84,7 @@ export class Users {
     @JoinTable({ name: 'users_control_groups' })
     controlGroups: ControlGroup[];
 
-    // @OneToMany(() => profiles, (profile) => profile.user)
-    // profiles: Profiles[]
+    @OneToMany(() => Profile, (profile) => profile.user)
+    profiles: Profile[];
 
 }

@@ -6,12 +6,15 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
-import { CreateProfileDto } from './dto/create-profile.dto';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { ProfileService } from './profile.service';
+import { CreateProfileDto } from '../dto/create-profile.dto';
+import { UpdateProfileDto } from '../dto/update-profile.dto';
+import { ProfileService } from '../service/profile.service';
+import { SessionGuard } from 'src/common/guards/session.guard';
 
 @Controller('profiles')
+@UseGuards(SessionGuard)
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 

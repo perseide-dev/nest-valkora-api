@@ -1,11 +1,21 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfileService } from './service/profile.service';
 import { ProfileController } from './controller/profile.controller';
-import { Module } from '@nestjs/common';
+import { Profile } from './entities/profile.entity';
+import { Assets } from './entities/assets.enttity';
+import { Lover } from './entities/lover.entity';
+import { ProfileInfo } from './entities/profileInfo.entity';
+import { Users } from '../users/entities/user.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [],
-  controllers: [ProfileController,],
-  providers: [ProfileService,],
-  exports: []
+  imports: [
+    TypeOrmModule.forFeature([Profile, Assets, Lover, ProfileInfo, Users]),
+    AuthModule, // Para el SessionGuard
+  ],
+  controllers: [ProfileController],
+  providers: [ProfileService],
+  exports: [ProfileService],
 })
 export class ProfileModule { }
