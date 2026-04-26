@@ -1,3 +1,4 @@
+import { ProfileModule } from './modules/profiles/profile.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { UserModule } from './modules/users/user.module';
@@ -11,7 +12,7 @@ import appConfig from './config/app.config';
 import { DebugLoggerMiddleware } from './common/middleware/debug-logger.middleware';
 
 @Module({
-  imports: [RolesModule, PermissionsModule, UserModule, AuthModule,
+  imports: [ProfileModule, RolesModule, PermissionsModule, UserModule, AuthModule,
     // 1. Configuración Global
     ConfigModule.forRoot({
       isGlobal: true,
