@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Index, OneToOne } from "typeorm";
 import { Exclude } from "class-transformer";
+import { Profile } from "./profile.entity";
 
 @Entity('assets')
 export class Assets {
@@ -29,5 +30,6 @@ export class Assets {
     @Column()
     favorite: string;
 
-
+    @OneToOne(() => Profile, (profile) => profile.assets)
+    profile: Profile;
 }
