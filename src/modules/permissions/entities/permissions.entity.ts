@@ -4,6 +4,7 @@ import {
     Column,
     ManyToOne,
     JoinColumn,
+    Index,
     CreateDateColumn,
     UpdateDateColumn
 } from 'typeorm';
@@ -11,11 +12,17 @@ import { Roles } from 'src/modules/roles/entities/roles.entity';
 import { Users } from 'src/modules/users/entities/user.entity';
 import { Modules } from 'src/common/enums/module.enum';
 import { Focus } from 'src/common/enums/focus.enum';
+import { Exclude } from 'class-transformer';
 
 @Entity('permissions')
 export class Permissions {
     @PrimaryGeneratedColumn()
+    @Exclude()
     id: number;
+
+    @Column({ type: 'uuid', unique: true, default: () => 'gen_random_uuid()' })
+    @Index()
+    uuid: string;
 
     @Column({ unique: true, nullable: false })
     permissionName: string;
