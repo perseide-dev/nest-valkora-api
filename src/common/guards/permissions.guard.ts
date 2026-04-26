@@ -13,6 +13,7 @@ import { Users } from 'src/modules/users/entities/user.entity';
 import { Permissions } from 'src/modules/permissions/entities/permissions.entity';
 import { Focus } from '../enums/focus.enum';
 import { Modules } from '../enums/module.enum';
+import { Profile } from 'src/modules/profiles/entities/profile.entity';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -22,6 +23,8 @@ export class PermissionsGuard implements CanActivate {
         private readonly userRepository: Repository<Users>,
         @InjectRepository(Permissions)
         private readonly permissionRepository: Repository<Permissions>,
+        @InjectRepository(Profile)
+        private readonly profileRepository: Repository<Profile>,
     ) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -72,14 +75,27 @@ export class PermissionsGuard implements CanActivate {
 
         // Lógica de FOCUS para recursos específicos (ID presente)
         if (permission.focus === Focus.SELF) {
+            // Regla especial: READ en Profiles es público según requerimiento
+            if (metadata.module === Modules.Profiles && metadata.action === 'read') return true;
+
             // En el módulo de USERS, SELF significa que el ID solicitado es el mío.
             if (metadata.module === Modules.Users) {
                 if (Number(resourceId) !== Number(user.id)) {
                     throw new ForbiddenException('Solo puedes acceder a tus propios datos');
                 }
             }
-            // Para otros módulos (ej. Profiles), se necesitaría buscar el dueño del recurso.
-            // Por ahora implementamos la lógica de USERS que es lo solicitado.
+
+            // En el módulo de PROFILES, buscar si el perfil me pertenece
+            if (metadata.module === Modules.Profiles && (metadata.action === 'update' || metadata.action === 'delete')) {
+                const profile = await this.profileRepository.findOne({
+                    where: { id: Number(resourceId) },
+                    relations: ['user']
+                });
+                if (!profile) throw new NotFoundException('Perfil no encontrado');
+                if (profile.user.id !== user.id) {
+                    throw new ForbiddenException('No eres el dueño de este perfil');
+                }
+            }
             return true;
         }
 

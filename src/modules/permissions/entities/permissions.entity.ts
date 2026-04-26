@@ -13,8 +13,10 @@ import { Users } from 'src/modules/users/entities/user.entity';
 import { Modules } from 'src/common/enums/module.enum';
 import { Focus } from 'src/common/enums/focus.enum';
 import { Exclude } from 'class-transformer';
+import { Unique } from 'typeorm';
 
 @Entity('permissions')
+@Unique(['rol', 'module'])
 export class Permissions {
     @PrimaryGeneratedColumn()
     @Exclude()
@@ -24,11 +26,11 @@ export class Permissions {
     @Index()
     uuid: string;
 
-    @Column({ unique: true, nullable: false })
+    @Column({ nullable: false })
     permissionName: string;
 
 
-    @Column({ type: 'enum', enum: Modules, unique: true, nullable: false })
+    @Column({ type: 'enum', enum: Modules, nullable: false })
     module: Modules;
 
     @Column({ type: 'enum', enum: Focus, default: Focus.SELF })

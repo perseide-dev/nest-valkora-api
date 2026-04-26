@@ -5,10 +5,11 @@ import { PermissionService } from './services/permission.service';
 import { PermissionController } from './controller/permission.controller';
 import { AuthModule } from '../auth/auth.module';
 import { Users } from '../users/entities/user.entity';
+import { Profile } from '../profiles/entities/profile.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Permissions, Users]),
+    TypeOrmModule.forFeature([Permissions, Users, Profile]),
     forwardRef(() => AuthModule),
   ],
   controllers: [PermissionController],
