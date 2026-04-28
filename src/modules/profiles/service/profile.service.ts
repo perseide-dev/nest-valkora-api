@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
-import { PaginationDto, PaginatedResponse } from 'src/common/dto/pagination.dto';
+import { PaginatedResponse } from 'src/common/dto/pagination.dto';
 import { Profile } from '../entities/profile.entity';
 import { Assets } from '../entities/assets.enttity';
 import { Lover } from '../entities/lover.entity';
 import { ProfileInfo } from '../entities/profileInfo.entity';
 import { Users } from 'src/modules/users/entities/user.entity';
+import { FindAllProfilesDto } from '../dto/find-all-profiles.dto';
 
 @Injectable()
 export class ProfileService {
@@ -52,14 +53,30 @@ export class ProfileService {
     return await this.profileRepository.save(profile);
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<PaginatedResponse<Profile>> {
-    const { page = 1, limit = 10 } = paginationDto;
+  async findAll(findAllProfilesDto: FindAllProfilesDto): Promise<PaginatedResponse<Profile>> {
+    const { page = 1, limit = 10, include, search } = findAllProfilesDto;
     const skip = (page - 1) * limit;
+
+    // Relaciones permitidas para evitar inyecciones o errores
+    const allowedRelations = ['assets', 'lover', 'profileInfo', 'user'];
+    
+    // Si viene 'include', lo separamos por comas y filtramos las que permitimos
+    let relations = allowedRelations; // Por defecto incluimos todas si no se especifica? 
+    // O tal vez el usuario quiere decidir cuáles SI o SI.
+    
+    if (include) {
+      relations = include.split(',').filter(rel => allowedRelations.includes(rel.trim()));
+    }
 
     const [data, total] = await this.profileRepository.findAndCount({
       skip,
       take: limit,
-      relations: ['assets', 'lover', 'profileInfo', 'user'],
+      relations,
+      where: search ? {
+        profileInfo: {
+          name: ILike(`%${search}%`)
+        }
+      } : {}
     });
 
     const lastPage = Math.ceil(total / limit);

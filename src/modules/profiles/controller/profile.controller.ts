@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { FindAllProfilesDto } from '../dto/find-all-profiles.dto';
 import { ProfileService } from '../service/profile.service';
 import { SessionGuard } from 'src/common/guards/session.guard';
 import { PermissionsGuard } from 'src/common/guards/permissions.guard';
@@ -36,8 +36,8 @@ export class ProfileController {
 
   @Get()
   @RequirePermissions(Modules.Profiles, 'read')
-  findAll(@Query() paginationDto: PaginationDto) {
-    return this.profileService.findAll(paginationDto);
+  findAll(@Query() findAllProfilesDto: FindAllProfilesDto) {
+    return this.profileService.findAll(findAllProfilesDto);
   }
 
   @Get(':id')
