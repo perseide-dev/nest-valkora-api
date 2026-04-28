@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
@@ -17,6 +18,7 @@ import { SessionGuard } from 'src/common/guards/session.guard';
 import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { RequirePermissions } from 'src/common/decorators/permissions.decorator';
 import { Modules } from 'src/common/enums/module.enum';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 
 @Controller('profiles')
 @UseGuards(SessionGuard, PermissionsGuard)
@@ -25,8 +27,11 @@ export class ProfileController {
 
   @Post()
   @RequirePermissions(Modules.Profiles, 'create')
-  create(@Body() createProfileDto: CreateProfileDto) {
-    return this.profileService.create(createProfileDto);
+  create(
+    @Body() createProfileDto: CreateProfileDto,
+    @CurrentUser('uuid') userUuid: string,
+  ) {
+    return this.profileService.create(userUuid, createProfileDto);
   }
 
   @Get()

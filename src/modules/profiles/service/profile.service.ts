@@ -25,8 +25,8 @@ export class ProfileService {
     private readonly userRepository: Repository<Users>,
   ) { }
 
-  async create(createProfileDto: CreateProfileDto) {
-    const { userUuid, assets, lover, profileInfo } = createProfileDto;
+  async create(userUuid: string, createProfileDto: CreateProfileDto) {
+    const { assets, lover, profileInfo } = createProfileDto;
 
     // 1. Find the user
     const user = await this.userRepository.findOne({ where: { uuid: userUuid } });

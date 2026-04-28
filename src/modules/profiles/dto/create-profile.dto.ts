@@ -3,38 +3,42 @@ import { Type } from 'class-transformer';
 
 class AssetsDto {
     @IsString()
-    @IsNotEmpty()
-    banner: string;
+    @IsOptional()
+    banner?: string;
 
     @IsString()
-    @IsNotEmpty()
-    profile1: string;
+    @IsOptional()
+    profile1?: string;
 
     @IsString()
-    @IsNotEmpty()
-    profile2: string;
+    @IsOptional()
+    profile2?: string;
 
     @IsString()
-    @IsNotEmpty()
-    albumn: string;
+    @IsOptional()
+    albumn?: string;
 
     @IsString()
-    @IsNotEmpty()
-    song: string;
+    @IsOptional()
+    song?: string;
 
     @IsString()
-    @IsNotEmpty()
-    favorite: string;
+    @IsOptional()
+    favorite?: string;
 }
 
 class LoverDto {
-    @IsString()
+    @IsUUID()
     @IsNotEmpty()
-    profileImg: string;
+    partnerUuid: string;
 
     @IsString()
-    @IsNotEmpty()
-    coverImg: string;
+    @IsOptional()
+    profileImg?: string;
+
+    @IsString()
+    @IsOptional()
+    coverImg?: string;
 }
 
 class ProfileInfoDto {
@@ -43,16 +47,16 @@ class ProfileInfoDto {
     name: string;
 
     @IsString()
-    @IsNotEmpty()
-    phrase: string;
+    @IsOptional()
+    phrase?: string;
 
     @IsString()
     @IsNotEmpty()
     nationality: string;
 
     @IsString()
-    @IsNotEmpty()
-    job: string;
+    @IsOptional()
+    job?: string;
 
     @IsString()
     @IsNotEmpty()
@@ -60,10 +64,6 @@ class ProfileInfoDto {
 }
 
 export class CreateProfileDto {
-    @IsUUID()
-    @IsNotEmpty()
-    userUuid: string;
-
     @IsObject()
     @Type(() => AssetsDto)
     assets: AssetsDto;

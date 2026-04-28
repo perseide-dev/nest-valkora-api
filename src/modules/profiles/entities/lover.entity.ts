@@ -12,11 +12,14 @@ export class Lover {
     @Index()
     uuid: string;
 
-    @Column()
+    @Column({ nullable: true })
     profileImg: string;
 
-    @Column()
+    @Column({ nullable: true })
     coverImg: string;
+
+    @Column({ type: 'uuid', nullable: true })
+    partnerUuid: string;
 
     @OneToOne(() => Profile, (profile) => profile.lover)
     profile: Profile;

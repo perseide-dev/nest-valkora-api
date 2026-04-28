@@ -15,13 +15,13 @@ export class ProfileInfo {
     @Column()
     name: string;
 
-    @Column()
+    @Column({ nullable: true })
     phrase: string
 
     @Column()
     nationality: string
 
-    @Column()
+    @Column({ nullable: true })
     job: string
 
     @Column()

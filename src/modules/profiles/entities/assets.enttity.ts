@@ -12,22 +12,22 @@ export class Assets {
     @Index()
     uuid: string;
 
-    @Column()
+    @Column({ nullable: true })
     banner: string;
 
-    @Column()
+    @Column({ nullable: true })
     profile1: string;
 
-    @Column()
+    @Column({ nullable: true })
     profile2: string;
 
-    @Column()
+    @Column({ nullable: true })
     albumn: string;
 
-    @Column()
+    @Column({ nullable: true })
     song: string;
 
-    @Column()
+    @Column({ nullable: true })
     favorite: string;
 
     @OneToOne(() => Profile, (profile) => profile.assets)

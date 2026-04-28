@@ -40,7 +40,7 @@ export class AuthService {
     if (!isMatch) throw new UnauthorizedException('Credenciales inválidas');
 
     // 2. Generate Tokens
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, uuid: user.uuid, email: user.email };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 

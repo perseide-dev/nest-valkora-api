@@ -43,7 +43,9 @@ export class AuthController {
     return {
       message: 'Login exitoso',
       user: {
-        username: user.userName,
+        uuid: user.uuid,
+        userName: user.userName,
+        accountName: user.accountName,
         email: user.email,
         rol: user.rol,
       },
