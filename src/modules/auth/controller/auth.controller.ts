@@ -26,7 +26,8 @@ export class AuthController {
     response.cookie('Authentication', accessToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'strict',
+      sameSite: 'lax',
+      path: '/',
       maxAge: 15 * 60 * 1000, // 15 minutos
     });
 
@@ -34,7 +35,7 @@ export class AuthController {
     response.cookie('Refresh', refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/', // Debe ser accesible globalmente para el SessionGuard
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
     });

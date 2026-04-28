@@ -46,7 +46,8 @@ export class SessionGuard implements CanActivate {
           response.cookie('Authentication', newAccessToken, {
             httpOnly: true,
             secure: isProduction,
-            sameSite: 'strict',
+            sameSite: 'lax',
+            path: '/',
             maxAge: 15 * 60 * 1000,
           });
 
