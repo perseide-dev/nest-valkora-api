@@ -6,6 +6,7 @@ import { Users } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { ControlGroup } from 'src/modules/control-groups/entities/control-group.entity';
+import { generateRandomAccountName } from 'src/common/utils/random-name.util';
 
 @Injectable()
 export class UsersService {
@@ -18,6 +19,11 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<Users> {
     const { password, controlGroupIds, rolId, ...userData } = createUserDto;
+
+    // Generar accountName random si no fue proporcionado
+    if (!userData.accountName) {
+      userData.accountName = generateRandomAccountName();
+    }
 
     // Verificar si el usuario ya existe
     const existingUser = await this.userRepository.findOne({
