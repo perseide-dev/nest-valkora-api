@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEnum, IsBoolean, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsBoolean, IsOptional, IsUUID } from 'class-validator';
 import { Modules } from 'src/common/enums/module.enum';
 import { Focus } from 'src/common/enums/focus.enum';
 
@@ -31,7 +31,7 @@ export class CreatePermissionDto {
     @IsOptional()
     delete?: boolean;
 
-    @IsNumber()
+    @IsUUID()
     @IsNotEmpty()
-    rolId: number;
+    rolUuid: string;
 }

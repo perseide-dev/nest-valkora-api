@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional, IsNumber, IsArray } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional, IsArray, IsUUID } from 'class-validator';
 
 export class CreateUserDto {
     @IsNotEmpty()
@@ -19,11 +19,11 @@ export class CreateUserDto {
     password: string;
 
     @IsNotEmpty()
-    @IsNumber()
-    rolId: number;
+    @IsUUID()
+    rolUuid: string;
 
     @IsOptional()
     @IsArray()
-    @IsNumber({}, { each: true })
-    controlGroupIds?: number[];
+    @IsUUID('all', { each: true })
+    controlGroupUuids?: string[];
 }

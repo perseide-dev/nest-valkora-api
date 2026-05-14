@@ -40,14 +40,14 @@ export class AuthService {
     if (!isMatch) throw new UnauthorizedException('Credenciales inválidas');
 
     // 2. Generate Tokens
-    const payload = { sub: user.id, uuid: user.uuid, email: user.email };
+    const payload = { sub: user.uuid, email: user.email };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
     // 3. Hash and store the refresh token in the database to maintain the session
     const salt = await bcrypt.genSalt();
     const hashedRT = await bcrypt.hash(refreshToken, salt);
-    await this.usersService.updateRefreshToken(user.id, hashedRT);
+    await this.usersService.updateRefreshToken(user.uuid, hashedRT);
 
     return { user, accessToken, refreshToken };
   }
@@ -55,7 +55,7 @@ export class AuthService {
   async refreshSession(refreshToken: string) {
     try {
       const payload = await this.jwtService.verifyAsync(refreshToken);
-      const user = await this.usersService.findOneById(payload.sub);
+      const user = await this.usersService.findOneByUuid(payload.sub);
 
       // 1. Compare the refresh token with the hash stored in the database
       if (!user.hashedRefreshToken) throw new UnauthorizedException('Sesión no encontrada');
@@ -63,7 +63,7 @@ export class AuthService {
       if (!isMatch) throw new UnauthorizedException();
 
       // 2. Generate new Access Token
-      const accessToken = this.jwtService.sign({ sub: user.id, email: user.email }, { expiresIn: '15m' });
+      const accessToken = this.jwtService.sign({ sub: user.uuid, email: user.email }, { expiresIn: '15m' });
 
       return { accessToken };
     } catch {

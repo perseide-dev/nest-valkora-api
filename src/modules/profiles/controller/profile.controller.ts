@@ -40,21 +40,21 @@ export class ProfileController {
     return this.profileService.findAll(findAllProfilesDto);
   }
 
-  @Get(':id')
+  @Get(':uuid')
   @RequirePermissions(Modules.Profiles, 'read')
-  findOne(@Param('id') id: string) {
-    return this.profileService.findOne(+id);
+  findOne(@Param('uuid') uuid: string) {
+    return this.profileService.findOneByUuid(uuid);
   }
 
-  @Patch(':id')
+  @Patch(':uuid')
   @RequirePermissions(Modules.Profiles, 'update')
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.profileService.update(+id, updateProfileDto);
+  update(@Param('uuid') uuid: string, @Body() updateProfileDto: UpdateProfileDto) {
+    return this.profileService.update(uuid, updateProfileDto);
   }
 
-  @Delete(':id')
+  @Delete(':uuid')
   @RequirePermissions(Modules.Profiles, 'delete')
-  remove(@Param('id') id: string) {
-    return this.profileService.remove(+id);
+  remove(@Param('uuid') uuid: string) {
+    return this.profileService.remove(uuid);
   }
 }

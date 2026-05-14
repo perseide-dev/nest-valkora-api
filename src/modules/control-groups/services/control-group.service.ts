@@ -20,23 +20,23 @@ export class ControlGroupService {
         return await this.controlGroupRepository.find({ relations: ['users'] });
     }
 
-    async findOne(id: number): Promise<ControlGroup> {
+    async findOneByUuid(uuid: string): Promise<ControlGroup> {
         const group = await this.controlGroupRepository.findOne({
-            where: { id },
+            where: { uuid },
             relations: ['users']
         });
         if (!group) throw new NotFoundException('Grupo de Control no encontrado');
         return group;
     }
 
-    async update(id: number, updateControlGroupDto: CreateControlGroupDto): Promise<ControlGroup> {
-        const group = await this.findOne(id);
+    async update(uuid: string, updateControlGroupDto: CreateControlGroupDto): Promise<ControlGroup> {
+        const group = await this.findOneByUuid(uuid);
         Object.assign(group, updateControlGroupDto);
         return await this.controlGroupRepository.save(group);
     }
 
-    async remove(id: number): Promise<void> {
-        const group = await this.findOne(id);
+    async remove(uuid: string): Promise<void> {
+        const group = await this.findOneByUuid(uuid);
         await this.controlGroupRepository.remove(group);
     }
 }

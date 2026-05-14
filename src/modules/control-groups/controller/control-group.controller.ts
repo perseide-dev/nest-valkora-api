@@ -32,21 +32,21 @@ export class ControlGroupController {
         return this.controlGroupService.findAll();
     }
 
-    @Get(':id')
+    @Get(':uuid')
     @RequirePermissions(Modules.Profiles, 'read')
-    findOne(@Param('id') id: string) {
-        return this.controlGroupService.findOne(+id);
+    findOne(@Param('uuid') uuid: string) {
+        return this.controlGroupService.findOneByUuid(uuid);
     }
 
-    @Patch(':id')
+    @Patch(':uuid')
     @RequirePermissions(Modules.Profiles, 'update')
-    update(@Param('id') id: string, @Body() updateControlGroupDto: CreateControlGroupDto) {
-        return this.controlGroupService.update(+id, updateControlGroupDto);
+    update(@Param('uuid') uuid: string, @Body() updateControlGroupDto: CreateControlGroupDto) {
+        return this.controlGroupService.update(uuid, updateControlGroupDto);
     }
 
-    @Delete(':id')
+    @Delete(':uuid')
     @RequirePermissions(Modules.Profiles, 'delete')
-    remove(@Param('id') id: string) {
-        return this.controlGroupService.remove(+id);
+    remove(@Param('uuid') uuid: string) {
+        return this.controlGroupService.remove(uuid);
     }
 }

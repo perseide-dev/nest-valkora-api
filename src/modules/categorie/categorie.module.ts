@@ -3,11 +3,12 @@ import { CategorieService } from './services/categorie.service';
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Categorie } from './entites/categorie.entity';
+import { Users } from '../users/entities/user.entity';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Categorie]),
+    TypeOrmModule.forFeature([Categorie, Users]),
     forwardRef(() => AuthModule),
   ],
   controllers: [CategorieController,],

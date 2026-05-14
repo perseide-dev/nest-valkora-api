@@ -32,21 +32,21 @@ export class RoleController {
         return this.roleService.findAll();
     }
 
-    @Get(':id')
+    @Get(':uuid')
     @RequirePermissions(Modules.Roles, 'read')
-    findOne(@Param('id') id: string) {
-        return this.roleService.findOne(+id);
+    findOne(@Param('uuid') uuid: string) {
+        return this.roleService.findOneByUuid(uuid);
     }
 
-    @Patch(':id')
+    @Patch(':uuid')
     @RequirePermissions(Modules.Roles, 'update')
-    update(@Param('id') id: string, @Body() updateRoleDto: CreateRoleDto) {
-        return this.roleService.update(+id, updateRoleDto);
+    update(@Param('uuid') uuid: string, @Body() updateRoleDto: CreateRoleDto) {
+        return this.roleService.update(uuid, updateRoleDto);
     }
 
-    @Delete(':id')
+    @Delete(':uuid')
     @RequirePermissions(Modules.Roles, 'delete')
-    remove(@Param('id') id: string) {
-        return this.roleService.remove(+id);
+    remove(@Param('uuid') uuid: string) {
+        return this.roleService.remove(uuid);
     }
 }

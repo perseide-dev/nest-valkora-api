@@ -20,23 +20,23 @@ export class RoleService {
         return await this.roleRepository.find({ relations: ['permissions'] });
     }
 
-    async findOne(id: number): Promise<Roles> {
+    async findOneByUuid(uuid: string): Promise<Roles> {
         const role = await this.roleRepository.findOne({
-            where: { id },
+            where: { uuid },
             relations: ['permissions']
         });
         if (!role) throw new NotFoundException('Rol no encontrado');
         return role;
     }
 
-    async update(id: number, updateRoleDto: CreateRoleDto): Promise<Roles> {
-        const role = await this.findOne(id);
+    async update(uuid: string, updateRoleDto: CreateRoleDto): Promise<Roles> {
+        const role = await this.findOneByUuid(uuid);
         Object.assign(role, updateRoleDto);
         return await this.roleRepository.save(role);
     }
 
-    async remove(id: number): Promise<void> {
-        const role = await this.findOne(id);
+    async remove(uuid: string): Promise<void> {
+        const role = await this.findOneByUuid(uuid);
         await this.roleRepository.remove(role);
     }
 }

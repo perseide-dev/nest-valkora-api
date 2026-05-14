@@ -6,6 +6,7 @@ import { Users } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { ControlGroup } from 'src/modules/control-groups/entities/control-group.entity';
+import { Roles } from 'src/modules/roles/entities/roles.entity';
 import { generateRandomAccountName } from 'src/common/utils/random-name.util';
 
 @Injectable()
@@ -15,10 +16,12 @@ export class UsersService {
     private readonly userRepository: Repository<Users>,
     @InjectRepository(ControlGroup)
     private readonly controlGroupRepository: Repository<ControlGroup>,
+    @InjectRepository(Roles)
+    private readonly rolesRepository: Repository<Roles>,
   ) { }
 
   async create(createUserDto: CreateUserDto): Promise<Users> {
-    const { password, controlGroupIds, rolId, ...userData } = createUserDto;
+    const { password, controlGroupUuids, rolUuid, ...userData } = createUserDto;
 
     // Generar accountName random si no fue proporcionado
     if (!userData.accountName) {
@@ -35,18 +38,22 @@ export class UsersService {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Buscar rol por UUID
+    const role = await this.rolesRepository.findOneBy({ uuid: rolUuid });
+    if (!role) throw new NotFoundException('Rol no encontrado');
+
     // Buscar grupos de control si se proporcionaron
     let controlGroups: ControlGroup[] = [];
-    if (controlGroupIds && controlGroupIds.length > 0) {
+    if (controlGroupUuids && controlGroupUuids.length > 0) {
       controlGroups = await this.controlGroupRepository.findBy({
-        id: In(controlGroupIds)
+        uuid: In(controlGroupUuids)
       });
     }
 
     const newUser = this.userRepository.create({
       ...userData,
       password: hashedPassword,
-      rol: { id: rolId } as any,
+      rol: role,
       controlGroups
     });
 
@@ -78,29 +85,33 @@ export class UsersService {
     return user;
   }
 
-  async findOneById(id: string | number): Promise<Users> {
+  async findOneByUuid(uuid: string): Promise<Users> {
     const user = await this.userRepository.findOne({
-      where: { id: Number(id) },
+      where: { uuid },
       relations: ['rol', 'controlGroups']
     });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;
   }
 
-  async update(id: string | number, updateUserDto: UpdateUserDto): Promise<Users> {
-    const user = await this.findOneById(id);
-    const { password, controlGroupIds, rolId, ...userData } = updateUserDto;
+  async update(uuid: string, updateUserDto: UpdateUserDto): Promise<Users> {
+    const user = await this.findOneByUuid(uuid);
+    const { password, controlGroupUuids, rolUuid, ...userData } = updateUserDto;
 
     if (password) {
       const salt = await bcrypt.genSalt();
       user.password = await bcrypt.hash(password, salt);
     }
 
-    if (rolId) user.rol = { id: rolId } as any;
+    if (rolUuid) {
+      const role = await this.rolesRepository.findOneBy({ uuid: rolUuid });
+      if (!role) throw new NotFoundException('Rol no encontrado');
+      user.rol = role;
+    }
 
-    if (controlGroupIds) {
+    if (controlGroupUuids) {
       user.controlGroups = await this.controlGroupRepository.findBy({
-        id: In(controlGroupIds)
+        uuid: In(controlGroupUuids)
       });
     }
 
@@ -108,12 +119,12 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  async remove(id: string | number): Promise<void> {
-    const user = await this.findOneById(id);
+  async remove(uuid: string): Promise<void> {
+    const user = await this.findOneByUuid(uuid);
     await this.userRepository.remove(user);
   }
 
-  async updateRefreshToken(id: string | number, refreshToken: string | undefined): Promise<void> {
-    await this.userRepository.update(id, { hashedRefreshToken: refreshToken });
+  async updateRefreshToken(uuid: string, refreshToken: string | undefined): Promise<void> {
+    await this.userRepository.update({ uuid }, { hashedRefreshToken: refreshToken });
   }
 }

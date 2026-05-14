@@ -5,13 +5,14 @@ import { UsersService } from './services/user.service';
 import { ControlGroup } from '../control-groups/entities/control-group.entity';
 import { Permissions } from '../permissions/entities/permissions.entity';
 import { Profile } from '../profiles/entities/profile.entity';
+import { Roles } from '../roles/entities/roles.entity';
 import { UsersController } from './controller/user.controller';
 import { AuthModule } from '../auth/auth.module';
 import { forwardRef } from '@nestjs/common';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users, ControlGroup, Permissions, Profile]),
+    TypeOrmModule.forFeature([Users, ControlGroup, Permissions, Profile, Roles]),
     forwardRef(() => AuthModule),
   ],
   controllers: [UsersController],

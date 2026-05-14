@@ -33,21 +33,21 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
+  @Get(':uuid')
   @RequirePermissions(Modules.Users, 'read')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOneById(id);
+  findOne(@Param('uuid') uuid: string) {
+    return this.usersService.findOneByUuid(uuid);
   }
 
-  @Patch(':id')
+  @Patch(':uuid')
   @RequirePermissions(Modules.Users, 'update')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  update(@Param('uuid') uuid: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(uuid, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete(':uuid')
   @RequirePermissions(Modules.Users, 'delete')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  remove(@Param('uuid') uuid: string) {
+    return this.usersService.remove(uuid);
   }
 }

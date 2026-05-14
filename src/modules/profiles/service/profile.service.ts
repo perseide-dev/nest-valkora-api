@@ -92,17 +92,17 @@ export class ProfileService {
     };
   }
 
-  async findOne(id: number) {
+  async findOneByUuid(uuid: string) {
     const profile = await this.profileRepository.findOne({
-      where: { id },
+      where: { uuid },
       relations: ['assets', 'lover', 'profileInfo', 'user'],
     });
     if (!profile) throw new NotFoundException('Perfil no encontrado');
     return profile;
   }
 
-  async update(id: number, updateProfileDto: UpdateProfileDto) {
-    const profile = await this.findOne(id);
+  async update(uuid: string, updateProfileDto: UpdateProfileDto) {
+    const profile = await this.findOneByUuid(uuid);
 
     if (updateProfileDto.assets) {
       Object.assign(profile.assets, updateProfileDto.assets);
@@ -122,8 +122,8 @@ export class ProfileService {
     return await this.profileRepository.save(profile);
   }
 
-  async remove(id: number) {
-    const profile = await this.findOne(id);
+  async remove(uuid: string) {
+    const profile = await this.findOneByUuid(uuid);
     return await this.profileRepository.remove(profile);
   }
 }

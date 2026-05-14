@@ -1,9 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, Index, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToOne } from "typeorm";
+import { Exclude } from "class-transformer";
 import { Users } from "src/modules/users/entities/user.entity";
 
 @Entity()
 export class Categorie {
     @PrimaryGeneratedColumn()
+    @Exclude()
     id: number;
 
     @Column({ type: 'uuid', unique: true, default: () => 'gen_random_uuid()' })

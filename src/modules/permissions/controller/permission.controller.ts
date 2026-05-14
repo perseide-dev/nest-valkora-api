@@ -32,21 +32,21 @@ export class PermissionController {
         return this.permissionService.findAll();
     }
 
-    @Get(':id')
+    @Get(':uuid')
     @RequirePermissions(Modules.Permissions, 'read')
-    findOne(@Param('id') id: string) {
-        return this.permissionService.findOne(+id);
+    findOne(@Param('uuid') uuid: string) {
+        return this.permissionService.findOneByUuid(uuid);
     }
 
-    @Patch(':id')
+    @Patch(':uuid')
     @RequirePermissions(Modules.Permissions, 'update')
-    update(@Param('id') id: string, @Body() updatePermissionDto: CreatePermissionDto) {
-        return this.permissionService.update(+id, updatePermissionDto);
+    update(@Param('uuid') uuid: string, @Body() updatePermissionDto: CreatePermissionDto) {
+        return this.permissionService.update(uuid, updatePermissionDto);
     }
 
-    @Delete(':id')
+    @Delete(':uuid')
     @RequirePermissions(Modules.Permissions, 'delete')
-    remove(@Param('id') id: string) {
-        return this.permissionService.remove(+id);
+    remove(@Param('uuid') uuid: string) {
+        return this.permissionService.remove(uuid);
     }
 }
