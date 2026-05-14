@@ -255,7 +255,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"permissionName\": \"READ_USERS\",\n    \"module\": \"USERS\",\n    \"read\": true,\n    \"create\": false,\n    \"update\": false,\n    \"delete\": false,\n    \"rolId\": 1\n}",
+							"raw": "{\n    \"permissionName\": \"READ_USERS\",\n    \"module\": \"USERS\",\n    \"read\": true,\n    \"create\": false,\n    \"update\": false,\n    \"delete\": false,\n    \"rolUuid\": \"{{rol_uuid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -320,7 +320,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userName\": \"persei\",\n    \"email\": \"persei@valkora.com\",\n    \"password\": \"password123\",\n    \"rolId\": 1\n}",
+							"raw": "{\n    \"userName\": \"persei\",\n    \"email\": \"persei@valkora.com\",\n    \"password\": \"password123\",\n    \"rolUuid\": \"{{rol_uuid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -421,6 +421,110 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Get All Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.uuid) {",
+									"    pm.collectionVariables.set(\"category_uuid\", jsonData.uuid);",
+									"    console.log(\"Category UUID saved: \" + jsonData.uuid);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Gaming\",\n    \"description\": \"Discusiones sobre videojuegos\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category by UUID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/{{category_uuid}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"{{category_uuid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [
@@ -443,6 +547,14 @@
 		{
 			"key": "partner_uuid",
 			"value": "00000000-0000-0000-0000-000000000000"
+		},
+		{
+			"key": "category_uuid",
+			"value": ""
+		},
+		{
+			"key": "rol_uuid",
+			"value": ""
 		}
 	]
 }
