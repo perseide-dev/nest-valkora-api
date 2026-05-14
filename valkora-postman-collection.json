@@ -190,7 +190,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"rolName\": \"EDITOR\"\n}",
+							"raw": "{\n    \"rolName\": \"EDITOR\",\n    \"permissions\": [\n        {\n            \"permissionName\": \"READ_CATEGORIES\",\n            \"module\": \"CATEGORIES\",\n            \"read\": true,\n            \"create\": false,\n            \"update\": false,\n            \"delete\": false\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"

@@ -22,7 +22,7 @@ export class Roles {
     @Column({ unique: true, nullable: false })
     rolName: string;
 
-    @OneToMany(() => Permissions, permission => permission.rol)
+    @OneToMany(() => Permissions, permission => permission.rol, { cascade: true })
     permissions: Permissions[];
 
     @OneToMany(() => Users, user => user.rol)

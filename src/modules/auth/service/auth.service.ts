@@ -40,7 +40,7 @@ export class AuthService {
     if (!isMatch) throw new UnauthorizedException('Credenciales inválidas');
 
     // 2. Generate Tokens
-    const payload = { sub: user.uuid, email: user.email };
+    const payload = { sub: user.uuid, uuid: user.uuid, email: user.email };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
@@ -63,7 +63,7 @@ export class AuthService {
       if (!isMatch) throw new UnauthorizedException();
 
       // 2. Generate new Access Token
-      const accessToken = this.jwtService.sign({ sub: user.uuid, email: user.email }, { expiresIn: '15m' });
+      const accessToken = this.jwtService.sign({ sub: user.uuid, uuid: user.uuid, email: user.email }, { expiresIn: '15m' });
 
       return { accessToken };
     } catch {

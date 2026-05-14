@@ -37,7 +37,7 @@ export class PermissionsGuard implements CanActivate {
 
         // 1. Cargar usuario con su ROL y Grupos de Control
         const user = await this.userRepository.findOne({
-            where: { id: userPayload.sub },
+            where: { uuid: userPayload.sub },
             relations: ['rol', 'controlGroups'],
         });
 
@@ -60,7 +60,7 @@ export class PermissionsGuard implements CanActivate {
         // 4. Verificar el Focus (Alcance)
         if (permission.focus === Focus.ALL) return true;
 
-        const resourceId = request.params.id;
+        const resourceId = request.params.uuid;
 
         // Si no hay ID de recurso (ej. un findAll), y el foco no es ALL, depende de la implementación.
         // Por ahora, si es un GET plural, permitimos y dejamos que el servicio filtre, o bloqueamos.
@@ -80,7 +80,7 @@ export class PermissionsGuard implements CanActivate {
 
             // En el módulo de USERS, SELF significa que el ID solicitado es el mío.
             if (metadata.module === Modules.Users) {
-                if (Number(resourceId) !== Number(user.id)) {
+                if (resourceId !== user.uuid) {
                     throw new ForbiddenException('Solo puedes acceder a tus propios datos');
                 }
             }
@@ -88,7 +88,7 @@ export class PermissionsGuard implements CanActivate {
             // En el módulo de PROFILES, buscar si el perfil me pertenece
             if (metadata.module === Modules.Profiles && (metadata.action === 'update' || metadata.action === 'delete')) {
                 const profile = await this.profileRepository.findOne({
-                    where: { id: Number(resourceId) },
+                    where: { uuid: resourceId },
                     relations: ['user']
                 });
                 if (!profile) throw new NotFoundException('Perfil no encontrado');
@@ -102,7 +102,7 @@ export class PermissionsGuard implements CanActivate {
         if (permission.focus === Focus.CONTROL_GROUP) {
             if (metadata.module === Modules.Users) {
                 const targetUser = await this.userRepository.findOne({
-                    where: { id: Number(resourceId) },
+                    where: { uuid: resourceId },
                     relations: ['controlGroups'],
                 });
                 if (!targetUser) throw new NotFoundException('Usuario objetivo no encontrado');
