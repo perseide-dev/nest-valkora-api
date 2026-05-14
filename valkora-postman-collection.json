@@ -46,9 +46,9 @@
 							"script": {
 								"exec": [
 									"var jsonData = pm.response.json();",
-									"if (jsonData.user && jsonData.user.uuid) {",
-									"    pm.collectionVariables.set(\"user_uuid\", jsonData.user.uuid);",
-									"    console.log(\"User UUID saved: \" + jsonData.user.uuid);",
+									"if (jsonData.data && jsonData.data.attributes && jsonData.data.attributes.uuid) {",
+									"    pm.collectionVariables.set(\"user_uuid\", jsonData.data.attributes.uuid);",
+									"    console.log(\"User UUID saved: \" + jsonData.data.attributes.uuid);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -99,9 +99,9 @@
 							"script": {
 								"exec": [
 									"var jsonData = pm.response.json();",
-									"if (jsonData.user && jsonData.user.uuid) {",
-									"    pm.collectionVariables.set(\"user_uuid\", jsonData.user.uuid);",
-									"    console.log(\"User UUID saved: \" + jsonData.user.uuid);",
+									"if (jsonData.data && jsonData.data.attributes && jsonData.data.attributes.uuid) {",
+									"    pm.collectionVariables.set(\"user_uuid\", jsonData.data.attributes.uuid);",
+									"    console.log(\"User UUID saved: \" + jsonData.data.attributes.uuid);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -161,7 +161,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/roles",
+							"raw": "{{base_url}}/roles?include=permissions",
 							"host": [
 								"{{base_url}}"
 							],
@@ -198,7 +198,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/roles",
+							"raw": "{{base_url}}/roles?include=permissions",
 							"host": [
 								"{{base_url}}"
 							],
@@ -291,7 +291,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/users",
+							"raw": "{{base_url}}/users?include=rol,controlGroups",
 							"host": [
 								"{{base_url}}"
 							],
@@ -375,10 +375,11 @@
 							"script": {
 								"exec": [
 									"var jsonData = pm.response.json();",
-									"if (jsonData.uuid) {",
-									"    pm.collectionVariables.set(\"profile_uuid\", jsonData.uuid);",
-									"    pm.collectionVariables.set(\"partner_uuid\", jsonData.uuid);",
-									"    console.log(\"Profile UUID saved: \" + jsonData.uuid);",
+									"if (jsonData.data && jsonData.data.attributes && jsonData.data.attributes.uuid) {",
+									"    var uuid = jsonData.data.attributes.uuid;",
+									"    pm.collectionVariables.set(\"profile_uuid\", uuid);",
+									"    pm.collectionVariables.set(\"partner_uuid\", uuid);",
+									"    console.log(\"Profile UUID saved: \" + uuid);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -437,7 +438,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/categories",
+							"raw": "{{base_url}}/categories?include=createdBy,updatedBy",
 							"host": [
 								"{{base_url}}"
 							],
@@ -456,9 +457,9 @@
 							"script": {
 								"exec": [
 									"var jsonData = pm.response.json();",
-									"if (jsonData.uuid) {",
-									"    pm.collectionVariables.set(\"category_uuid\", jsonData.uuid);",
-									"    console.log(\"Category UUID saved: \" + jsonData.uuid);",
+									"if (jsonData.data && jsonData.data.attributes && jsonData.data.attributes.uuid) {",
+									"    pm.collectionVariables.set(\"category_uuid\", jsonData.data.attributes.uuid);",
+									"    console.log(\"Category UUID saved: \" + jsonData.data.attributes.uuid);",
 									"}"
 								],
 								"type": "text/javascript"

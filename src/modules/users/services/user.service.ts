@@ -8,6 +8,9 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { ControlGroup } from 'src/modules/control-groups/entities/control-group.entity';
 import { Roles } from 'src/modules/roles/entities/roles.entity';
 import { generateRandomAccountName } from 'src/common/utils/random-name.util';
+import { BaseQueryDto } from 'src/common/dto/base-query.dto';
+import { parseIncludes } from 'src/common/utils/typeorm-query.helper';
+import { PaginatedResponse } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class UsersService {
@@ -60,8 +63,30 @@ export class UsersService {
     return await this.userRepository.save(newUser);
   }
 
-  async findAll(): Promise<Users[]> {
-    return await this.userRepository.find({ relations: ['rol', 'controlGroups'] });
+  async findAll(query: BaseQueryDto): Promise<PaginatedResponse<Users>> {
+    const { page = 1, limit = 10, include } = query;
+    const skip = (page - 1) * limit;
+    const relations = parseIncludes(include);
+
+    const [data, total] = await this.userRepository.findAndCount({
+      skip,
+      take: limit,
+      relations: {
+          ...relations,
+          rol: relations.rol || true,
+          controlGroups: relations.controlGroups || true,
+      },
+    });
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        lastPage: Math.ceil(total / limit),
+        limit,
+      },
+    };
   }
 
   async findOneByEmail(email: string): Promise<Users> {
@@ -85,10 +110,15 @@ export class UsersService {
     return user;
   }
 
-  async findOneByUuid(uuid: string): Promise<Users> {
+  async findOneByUuid(uuid: string, query?: BaseQueryDto): Promise<Users> {
+    const relations = parseIncludes(query?.include);
     const user = await this.userRepository.findOne({
       where: { uuid },
-      relations: ['rol', 'controlGroups']
+      relations: {
+          ...relations,
+          rol: relations.rol || true,
+          controlGroups: relations.controlGroups || true,
+      },
     });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;

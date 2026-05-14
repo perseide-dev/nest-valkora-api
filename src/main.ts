@@ -23,8 +23,8 @@ async function bootstrap() {
 
   // 4. Habilitar Interceptores Globales (Respuesta estándar y Serialización)
   app.useGlobalInterceptors(
-    new StandardResponseInterceptor(),
-    new ClassSerializerInterceptor(app.get(Reflector))
+    new ClassSerializerInterceptor(app.get(Reflector)),
+    new StandardResponseInterceptor()
   );
 
   // 5. Habilitar Cookie Parser para JWT en cookies

@@ -5,6 +5,9 @@ import { Categorie } from '../entites/categorie.entity';
 import { CreateCategorieDto } from '../dto/create-categorie.dto';
 import { UpdateCategorieDto } from '../dto/update-categorie.dto';
 import { Users } from 'src/modules/users/entities/user.entity';
+import { BaseQueryDto } from 'src/common/dto/base-query.dto';
+import { parseIncludes } from 'src/common/utils/typeorm-query.helper';
+import { PaginatedResponse } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class CategorieService {
@@ -24,16 +27,41 @@ export class CategorieService {
     return await this.categorieRepository.save(newCategorie);
   }
 
-  async findAll(): Promise<Categorie[]> {
-    return await this.categorieRepository.find({
-      relations: ['createdBy', 'updatedBy'],
+  async findAll(query: BaseQueryDto): Promise<PaginatedResponse<Categorie>> {
+    const { page = 1, limit = 10, include } = query;
+    const skip = (page - 1) * limit;
+    const relations = parseIncludes(include);
+
+    const [data, total] = await this.categorieRepository.findAndCount({
+      skip,
+      take: limit,
+      relations: {
+          ...relations,
+          createdBy: relations.createdBy || true,
+          updatedBy: relations.updatedBy || true,
+      },
     });
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        lastPage: Math.ceil(total / limit),
+        limit,
+      },
+    };
   }
 
-  async findOneByUuid(uuid: string): Promise<Categorie> {
+  async findOneByUuid(uuid: string, query?: BaseQueryDto): Promise<Categorie> {
+    const relations = parseIncludes(query?.include);
     const categorie = await this.categorieRepository.findOne({
       where: { uuid },
-      relations: ['createdBy', 'updatedBy'],
+      relations: {
+          ...relations,
+          createdBy: relations.createdBy || true,
+          updatedBy: relations.updatedBy || true,
+      },
     });
     if (!categorie) throw new NotFoundException('Categoría no encontrada');
     return categorie;

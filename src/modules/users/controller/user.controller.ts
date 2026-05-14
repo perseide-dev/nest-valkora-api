@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from '../services/user.service';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -15,6 +16,7 @@ import { SessionGuard } from 'src/common/guards/session.guard';
 import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { RequirePermissions } from 'src/common/decorators/permissions.decorator';
 import { Modules } from 'src/common/enums/module.enum';
+import { BaseQueryDto } from 'src/common/dto/base-query.dto';
 
 @Controller('users')
 @UseGuards(SessionGuard, PermissionsGuard)
@@ -29,14 +31,14 @@ export class UsersController {
 
   @Get()
   @RequirePermissions(Modules.Users, 'read')
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() query: BaseQueryDto) {
+    return this.usersService.findAll(query);
   }
 
   @Get(':uuid')
   @RequirePermissions(Modules.Users, 'read')
-  findOne(@Param('uuid') uuid: string) {
-    return this.usersService.findOneByUuid(uuid);
+  findOne(@Param('uuid') uuid: string, @Query() query: BaseQueryDto) {
+    return this.usersService.findOneByUuid(uuid, query);
   }
 
   @Patch(':uuid')

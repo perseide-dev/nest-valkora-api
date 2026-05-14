@@ -18,6 +18,8 @@ import { UpdateCategorieDto } from '../dto/update-categorie.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Users } from 'src/modules/users/entities/user.entity';
 
+import { BaseQueryDto } from 'src/common/dto/base-query.dto';
+
 @Controller('categories')
 @UseGuards(SessionGuard, PermissionsGuard)
 export class CategorieController {
@@ -34,14 +36,14 @@ export class CategorieController {
 
   @Get()
   @RequirePermissions(Modules.Categories, 'read')
-  findAll() {
-    return this.categorieService.findAll();
+  findAll(@Query() query: BaseQueryDto) {
+    return this.categorieService.findAll(query);
   }
 
   @Get(':uuid')
   @RequirePermissions(Modules.Categories, 'read')
-  findOne(@Param('uuid') uuid: string) {
-    return this.categorieService.findOneByUuid(uuid);
+  findOne(@Param('uuid') uuid: string, @Query() query: BaseQueryDto) {
+    return this.categorieService.findOneByUuid(uuid, query);
   }
 
   @Patch(':uuid')
