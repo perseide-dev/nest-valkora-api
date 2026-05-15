@@ -6,6 +6,7 @@ import {
     Patch,
     Param,
     Delete,
+    Query,
     UseGuards,
 } from '@nestjs/common';
 import { RoleService } from '../services/role.service';
@@ -15,6 +16,7 @@ import { SessionGuard } from 'src/common/guards/session.guard';
 import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { RequirePermissions } from 'src/common/decorators/permissions.decorator';
 import { Modules } from 'src/common/enums/module.enum';
+import { BaseQueryDto } from 'src/common/dto/base-query.dto';
 
 @Controller('roles')
 @UseGuards(SessionGuard, PermissionsGuard)
@@ -29,14 +31,14 @@ export class RoleController {
 
     @Get()
     @RequirePermissions(Modules.Roles, 'read')
-    findAll() {
-        return this.roleService.findAll();
+    findAll(@Query() query: BaseQueryDto) {
+        return this.roleService.findAll(query);
     }
 
     @Get(':uuid')
     @RequirePermissions(Modules.Roles, 'read')
-    findOne(@Param('uuid') uuid: string) {
-        return this.roleService.findOneByUuid(uuid);
+    findOne(@Param('uuid') uuid: string, @Query() query: BaseQueryDto) {
+        return this.roleService.findOneByUuid(uuid, query);
     }
 
     @Patch(':uuid')

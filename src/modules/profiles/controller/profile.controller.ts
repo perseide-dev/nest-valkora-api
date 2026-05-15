@@ -19,6 +19,7 @@ import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { RequirePermissions } from 'src/common/decorators/permissions.decorator';
 import { Modules } from 'src/common/enums/module.enum';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { BaseQueryDto } from 'src/common/dto/base-query.dto';
 
 @Controller('profiles')
 @UseGuards(SessionGuard, PermissionsGuard)
@@ -42,8 +43,8 @@ export class ProfileController {
 
   @Get(':uuid')
   @RequirePermissions(Modules.Profiles, 'read')
-  findOne(@Param('uuid') uuid: string) {
-    return this.profileService.findOneByUuid(uuid);
+  findOne(@Param('uuid') uuid: string, @Query() query: BaseQueryDto) {
+    return this.profileService.findOneByUuid(uuid, query);
   }
 
   @Patch(':uuid')

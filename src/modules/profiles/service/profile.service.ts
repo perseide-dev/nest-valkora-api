@@ -10,6 +10,8 @@ import { Lover } from '../entities/lover.entity';
 import { ProfileInfo } from '../entities/profileInfo.entity';
 import { Users } from 'src/modules/users/entities/user.entity';
 import { FindAllProfilesDto } from '../dto/find-all-profiles.dto';
+import { parseIncludes } from 'src/common/utils/typeorm-query.helper';
+import { BaseQueryDto } from 'src/common/dto/base-query.dto';
 
 @Injectable()
 export class ProfileService {
@@ -57,21 +59,18 @@ export class ProfileService {
     const { page = 1, limit = 10, include, search } = findAllProfilesDto;
     const skip = (page - 1) * limit;
 
-    // Relaciones permitidas para evitar inyecciones o errores
-    const allowedRelations = ['assets', 'lover', 'profileInfo', 'user'];
-    
-    // Si viene 'include', lo separamos por comas y filtramos las que permitimos
-    let relations = allowedRelations; // Por defecto incluimos todas si no se especifica? 
-    // O tal vez el usuario quiere decidir cuáles SI o SI.
-    
-    if (include) {
-      relations = include.split(',').filter(rel => allowedRelations.includes(rel.trim()));
-    }
+    const relations = parseIncludes(include);
 
     const [data, total] = await this.profileRepository.findAndCount({
       skip,
       take: limit,
-      relations,
+      relations: {
+          ...relations,
+          assets: relations.assets || true,
+          lover: relations.lover || true,
+          profileInfo: relations.profileInfo || true,
+          user: relations.user || true,
+      },
       where: search ? {
         profileInfo: {
           name: ILike(`%${search}%`)
@@ -92,10 +91,17 @@ export class ProfileService {
     };
   }
 
-  async findOneByUuid(uuid: string) {
+  async findOneByUuid(uuid: string, query?: BaseQueryDto) {
+    const relations = parseIncludes(query?.include);
     const profile = await this.profileRepository.findOne({
       where: { uuid },
-      relations: ['assets', 'lover', 'profileInfo', 'user'],
+      relations: {
+          ...relations,
+          assets: relations.assets || true,
+          lover: relations.lover || true,
+          profileInfo: relations.profileInfo || true,
+          user: relations.user || true,
+      },
     });
     if (!profile) throw new NotFoundException('Perfil no encontrado');
     return profile;

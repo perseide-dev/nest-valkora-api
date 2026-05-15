@@ -5,7 +5,7 @@ import { FindOptionsRelations } from 'typeorm';
  * en un objeto compatible con TypeORM relations.
  * Ejemplo: "rol,controlGroups.users" -> { rol: true, controlGroups: { users: true } }
  */
-export function parseIncludes(includeStr: string): FindOptionsRelations<any> {
+export function parseIncludes(includeStr?: string): FindOptionsRelations<any> {
     if (!includeStr) return {};
 
     const relations: any = {};

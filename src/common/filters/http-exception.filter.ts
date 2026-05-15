@@ -39,11 +39,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const errorResponse = {
       success: false,
-      statusCode: status,
-      path: request.url,
-      timestamp: new Date().toISOString(),
-      message: Array.isArray(message) ? 'Validation failed' : message,
-      errors: Array.isArray(message) ? message : errors,
+      error: {
+        statusCode: status,
+        message: Array.isArray(message) ? 'Validation failed' : message,
+        details: Array.isArray(message) ? message : errors,
+        path: request.url,
+        timestamp: new Date().toISOString(),
+      },
     };
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
