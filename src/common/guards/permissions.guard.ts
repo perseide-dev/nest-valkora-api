@@ -72,7 +72,7 @@ export class PermissionsGuard implements CanActivate {
         // pero el SERVICIO debe ser el encargado de filtrar los resultados.
         if (!resourceId) {
             if (metadata.action === 'create') return true;
-            return true; 
+            return true;
         }
 
         // Evaluación de permisos uno por uno hasta encontrar uno que autorice
@@ -95,14 +95,15 @@ export class PermissionsGuard implements CanActivate {
             }
 
             if (permission.focus === Focus.CONTROL_GROUP && permission.controlGroup) {
+                const allowedGroup = permission.controlGroup;
                 if (metadata.module === Modules.Users) {
                     const targetUser = await this.userRepository.findOne({
                         where: { uuid: resourceId },
                         relations: ['controlGroups'],
                     });
-                    
+
                     if (targetUser) {
-                        const isInGroup = targetUser.controlGroups.some(g => g.id === permission.controlGroup.id);
+                        const isInGroup = targetUser.controlGroups.some(g => g.id === allowedGroup.id);
                         if (isInGroup) return true;
                     }
                 }
