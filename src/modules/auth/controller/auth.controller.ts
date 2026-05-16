@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, UnauthorizedException, HttpStatus, Headers } from '@nestjs/common';
+import { Controller, Post, Body, Res, UnauthorizedException, HttpStatus, Headers, Query } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Response } from 'express';
 import { AuthService } from '../service/auth.service';
@@ -17,8 +17,9 @@ export class AuthController {
   async login(
     @Body() loginDto: LoginUserDto,
     @Res({ passthrough: true }) response: Response,
+    @Query('include') include?: string,
   ) {
-    const { user, accessToken, refreshToken } = await this.authService.login(loginDto);
+    const { user, accessToken, refreshToken } = await this.authService.login(loginDto, include);
 
     const isProduction = this.configService.get('config.NODE_ENV') === 'production';
 

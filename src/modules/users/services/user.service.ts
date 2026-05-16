@@ -98,13 +98,18 @@ export class UsersService {
     return user;
   }
 
-  async findOneByIdentity(identity: string): Promise<Users> {
+  async findOneByIdentity(identity: string, include?: string): Promise<Users> {
+    const relations = parseIncludes(include);
     const user = await this.userRepository.findOne({
       where: [
         { email: identity },
         { userName: identity }
       ],
-      relations: ['rol', 'controlGroups']
+      relations: {
+          ...relations,
+          rol: relations.rol || true,
+          controlGroups: relations.controlGroups || true,
+      },
     });
     if (!user) throw new NotFoundException('Usuario no encontrado por email o username');
     return user;

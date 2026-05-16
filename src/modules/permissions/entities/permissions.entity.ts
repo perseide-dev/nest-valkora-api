@@ -47,10 +47,12 @@ export class Permissions {
     @Column({ default: true })
     delete: boolean;
 
+    @Exclude()
     @ManyToOne(() => Roles, role => role.permissions, { nullable: false })
     @JoinColumn({ name: 'rol_id' })
     rol: Roles;
 
+    @Exclude()
     @ManyToOne(() => ControlGroup, (cg) => cg.permissions, { nullable: true })
     @JoinColumn({ name: 'control_group_id' })
     controlGroup: ControlGroup | null;
@@ -61,10 +63,12 @@ export class Permissions {
     @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
 
+    @Exclude()
     @ManyToOne(() => Users)
     @JoinColumn({ name: 'created_by_id' })
     createdBy: Users;
 
+    @Exclude()
     @ManyToOne(() => Users)
     @JoinColumn({ name: 'updated_by_id' })
     updatedBy: Users;

@@ -65,25 +65,30 @@ export class Users {
 
     // Audit FKs
 
+    @Exclude()
     @ManyToOne(() => Users)
     @JoinColumn({ name: 'created_by_id' })
     createdBy: Users;
 
 
+    @Exclude()
     @ManyToOne(() => Users)
     @JoinColumn({ name: 'updated_by_id' })
     updatedBy: Users;
 
     // FKs
 
+    @Exclude()
     @ManyToOne(() => Roles, role => role.users, { nullable: false })
     @JoinColumn({ name: 'rol_id' })
     rol: Roles;
 
+    @Exclude()
     @ManyToMany(() => ControlGroup, (cg) => cg.users)
     @JoinTable({ name: 'users_control_groups' })
     controlGroups: ControlGroup[];
 
+    @Exclude()
     @OneToMany(() => Profile, (profile) => profile.user)
     profiles: Profile[];
 

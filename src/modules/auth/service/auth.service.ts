@@ -26,10 +26,10 @@ export class AuthService {
     private readonly userRepository: Repository<Users>,
   ) { }
 
-  async login(loginDto: LoginUserDto) {
+  async login(loginDto: LoginUserDto, include?: string) {
     let user;
     try {
-      user = await this.usersService.findOneByIdentity(loginDto.email);
+      user = await this.usersService.findOneByIdentity(loginDto.email, include);
     } catch (error) {
       // Por seguridad, si el usuario no existe, devolvemos 401 en lugar de 404
       throw new UnauthorizedException('Credenciales inválidas');

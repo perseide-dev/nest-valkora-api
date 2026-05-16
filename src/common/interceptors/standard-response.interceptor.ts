@@ -117,7 +117,9 @@ export class StandardResponseInterceptor<T>
 
       // Determinamos si el valor es una entidad o un array de entidades
       const isEntity = transformedValue && typeof transformedValue === 'object' && transformedValue.entity;
-      const isEntityArray = Array.isArray(transformedValue) && transformedValue.length > 0 && transformedValue[0].entity;
+      // Si es un array vacío, lo consideramos relación si la propiedad fue excluida de plainData (indicador de @Exclude en relación)
+      const isEntityArray = Array.isArray(transformedValue) && 
+        (transformedValue.length > 0 ? transformedValue[0].entity : (!plainData.hasOwnProperty(key) && Array.isArray(value)));
 
       if (isEntity || isEntityArray) {
           // SOLO lo movemos a relationships si el path está en allowedIncludes o es padre de uno

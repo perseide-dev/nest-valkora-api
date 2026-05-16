@@ -19,9 +19,11 @@ export class ControlGroup {
     @Column({ nullable: true })
     description: string;
 
+    @Exclude()
     @ManyToMany(() => Users, (user) => user.controlGroups)
     users: Users[];
 
+    @Exclude()
     @OneToMany(() => Permissions, (permission) => permission.controlGroup)
     permissions: Permissions[];
 }
