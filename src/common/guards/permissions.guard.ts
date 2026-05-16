@@ -35,90 +35,83 @@ export class PermissionsGuard implements CanActivate {
         const userPayload = request.user;
         if (!userPayload) return false;
 
-        // 1. Cargar usuario con su ROL y Grupos de Control
+        // 1. Cargar usuario con su ROL
         const user = await this.userRepository.findOne({
             where: { uuid: userPayload.sub },
-            relations: ['rol', 'controlGroups'],
+            relations: ['rol'],
         });
 
         if (!user || !user.rol) throw new ForbiddenException('Usuario o Rol no encontrado');
 
-        // 2. Buscar el permiso específico para este Rol y Módulo
-        const permission = await this.permissionRepository.findOne({
+        // 2. Buscar TODOS los permisos para este Rol y Módulo
+        const permissions = await this.permissionRepository.find({
             where: {
                 rol: { id: user.rol.id },
                 module: metadata.module,
-            }
+            },
+            relations: ['controlGroup']
         });
 
-        if (!permission) throw new ForbiddenException(`No tienes permisos definidos para el módulo ${metadata.module}`);
+        if (permissions.length === 0) {
+            throw new ForbiddenException(`No tienes permisos definidos para el módulo ${metadata.module}`);
+        }
 
-        // 3. Verificar la acción booleana
-        const hasAction = permission[metadata.action];
-        if (!hasAction) throw new ForbiddenException(`No tienes permiso para ${metadata.action} en ${metadata.module}`);
+        // 3. Filtrar los que tienen la acción permitida
+        const validPermissions = permissions.filter(p => p[metadata.action]);
+        if (validPermissions.length === 0) {
+            throw new ForbiddenException(`No tienes permiso para ${metadata.action} en ${metadata.module}`);
+        }
 
-        // 4. Verificar el Focus (Alcance)
-        if (permission.focus === Focus.ALL) return true;
+        // 4. Evaluar el Focus (Alcance)
+        // Si alguno es ALL, permitimos de inmediato
+        if (validPermissions.some(p => p.focus === Focus.ALL)) return true;
 
         const resourceId = request.params.uuid;
 
-        // Si no hay ID de recurso (ej. un findAll), y el foco no es ALL, depende de la implementación.
-        // Por ahora, si es un GET plural, permitimos y dejamos que el servicio filtre, o bloqueamos.
-        // El usuario pidió que se relacionara al grupo de control.
+        // Si no hay ID de recurso (ej. un findAll), y el foco no es ALL, permitimos pasar 
+        // pero el SERVICIO debe ser el encargado de filtrar los resultados.
         if (!resourceId) {
-            // Para creación (POST), el focus SELF/CONTROL_GROUP suele ser válido.
             if (metadata.action === 'create') return true;
-            
-            // Para lectura de listas, si no es ALL, el Guard permite pasar pero el SERVICIO debe filtrar.
             return true; 
         }
 
-        // Lógica de FOCUS para recursos específicos (ID presente)
-        if (permission.focus === Focus.SELF) {
-            // Regla especial: READ en Profiles es público según requerimiento
-            if (metadata.module === Modules.Profiles && metadata.action === 'read') return true;
+        // Evaluación de permisos uno por uno hasta encontrar uno que autorice
+        for (const permission of validPermissions) {
+            if (permission.focus === Focus.SELF) {
+                // Regla especial: READ en Profiles es público
+                if (metadata.module === Modules.Profiles && metadata.action === 'read') return true;
 
-            // En el módulo de USERS, SELF significa que el ID solicitado es el mío.
-            if (metadata.module === Modules.Users) {
-                if (resourceId !== user.uuid) {
-                    throw new ForbiddenException('Solo puedes acceder a tus propios datos');
+                if (metadata.module === Modules.Users) {
+                    if (resourceId === user.uuid) return true;
+                }
+
+                if (metadata.module === Modules.Profiles && (metadata.action === 'update' || metadata.action === 'delete')) {
+                    const profile = await this.profileRepository.findOne({
+                        where: { uuid: resourceId },
+                        relations: ['user']
+                    });
+                    if (profile && profile.user.id === user.id) return true;
                 }
             }
 
-            // En el módulo de PROFILES, buscar si el perfil me pertenece
-            if (metadata.module === Modules.Profiles && (metadata.action === 'update' || metadata.action === 'delete')) {
-                const profile = await this.profileRepository.findOne({
-                    where: { uuid: resourceId },
-                    relations: ['user']
-                });
-                if (!profile) throw new NotFoundException('Perfil no encontrado');
-                if (profile.user.id !== user.id) {
-                    throw new ForbiddenException('No eres el dueño de este perfil');
+            if (permission.focus === Focus.CONTROL_GROUP && permission.controlGroup) {
+                if (metadata.module === Modules.Users) {
+                    const targetUser = await this.userRepository.findOne({
+                        where: { uuid: resourceId },
+                        relations: ['controlGroups'],
+                    });
+                    
+                    if (targetUser) {
+                        const isInGroup = targetUser.controlGroups.some(g => g.id === permission.controlGroup.id);
+                        if (isInGroup) return true;
+                    }
                 }
+                // Si el módulo no es Users, se podría implementar lógica similar para otros recursos
+                // que estén vinculados a grupos de control.
             }
-            return true;
         }
 
-        if (permission.focus === Focus.CONTROL_GROUP) {
-            if (metadata.module === Modules.Users) {
-                const targetUser = await this.userRepository.findOne({
-                    where: { uuid: resourceId },
-                    relations: ['controlGroups'],
-                });
-                if (!targetUser) throw new NotFoundException('Usuario objetivo no encontrado');
-
-                // Verificar intersección de grupos
-                const userGroupIds = user.controlGroups.map(g => g.id);
-                const targetGroupIds = targetUser.controlGroups.map(g => g.id);
-                const hasIntersection = userGroupIds.some(id => targetGroupIds.includes(id));
-
-                if (!hasIntersection) {
-                    throw new ForbiddenException('El usuario no pertenece a ninguno de tus grupos de control');
-                }
-            }
-            return true;
-        }
-
-        return false;
+        // Si después de revisar todos los permisos ninguno autorizó el acceso al recurso específico
+        throw new ForbiddenException('No tienes autorización sobre este recurso específico');
     }
 }
