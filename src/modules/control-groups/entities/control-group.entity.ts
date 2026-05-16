@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, Index, OneToMany } from 'typeorm';
 import { Users } from 'src/modules/users/entities/user.entity';
+import { Permissions } from 'src/modules/permissions/entities/permissions.entity';
 import { Exclude } from 'class-transformer';
 
 @Entity('control_groups')
@@ -20,4 +21,7 @@ export class ControlGroup {
 
     @ManyToMany(() => Users, (user) => user.controlGroups)
     users: Users[];
+
+    @OneToMany(() => Permissions, (permission) => permission.controlGroup)
+    permissions: Permissions[];
 }

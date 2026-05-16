@@ -4,4 +4,5 @@ export enum Modules {
     Permissions = 'PERMISSIONS',
     Profiles = 'PROFILES',
     Categories = 'CATEGORIES',
+    ControlGroups = 'CONTROL_GROUPS',
 }

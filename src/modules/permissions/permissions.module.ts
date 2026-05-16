@@ -7,10 +7,11 @@ import { AuthModule } from '../auth/auth.module';
 import { Users } from '../users/entities/user.entity';
 import { Profile } from '../profiles/entities/profile.entity';
 import { Roles } from '../roles/entities/roles.entity';
+import { ControlGroup } from '../control-groups/entities/control-group.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Permissions, Users, Profile, Roles]),
+    TypeOrmModule.forFeature([Permissions, Users, Profile, Roles, ControlGroup]),
     forwardRef(() => AuthModule),
   ],
   controllers: [PermissionController],

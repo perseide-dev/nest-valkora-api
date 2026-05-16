@@ -34,4 +34,8 @@ export class CreatePermissionDto {
     @IsUUID()
     @IsNotEmpty()
     rolUuid: string;
+
+    @IsUUID()
+    @IsOptional()
+    controlGroupUuid?: string;
 }

@@ -10,13 +10,12 @@ import {
 } from 'typeorm';
 import { Roles } from 'src/modules/roles/entities/roles.entity';
 import { Users } from 'src/modules/users/entities/user.entity';
+import { ControlGroup } from 'src/modules/control-groups/entities/control-group.entity';
 import { Modules } from 'src/common/enums/module.enum';
 import { Focus } from 'src/common/enums/focus.enum';
 import { Exclude } from 'class-transformer';
-import { Unique } from 'typeorm';
 
 @Entity('permissions')
-@Unique(['rol', 'module'])
 export class Permissions {
     @PrimaryGeneratedColumn()
     @Exclude()
@@ -51,6 +50,10 @@ export class Permissions {
     @ManyToOne(() => Roles, role => role.permissions, { nullable: false })
     @JoinColumn({ name: 'rol_id' })
     rol: Roles;
+
+    @ManyToOne(() => ControlGroup, (cg) => cg.permissions, { nullable: true })
+    @JoinColumn({ name: 'control_group_id' })
+    controlGroup: ControlGroup | null;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
